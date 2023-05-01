@@ -14,8 +14,17 @@ headers = {
     'Authorization': 'Basic '+authorization
 }
 
-def create_work_item(work_item_data, parent_id=None) -> Dict[int, int]:
+def create_work_item(work_item_data, parent_id=None, new_epic_name=None) -> Dict[int, int]:
     work_item_fields = work_item_data['fields']
+    work_item_type = work_item_fields['System.WorkItemType']
+    
+    if new_epic_name and work_item_type == "Epic":
+        work_item_fields['System.Title'] = new_epic_name
+        
+    if work_item_fields.get('System.Tags'):
+        work_item_fields['System.Tags'] += f"; {new_epic_name}"
+    else:
+        work_item_fields['System.Tags'] = new_epic_name
 
     field_keys = [
         'System.AreaPath',
@@ -60,7 +69,7 @@ def create_work_item(work_item_data, parent_id=None) -> Dict[int, int]:
     old_work_item_id = work_item_data['id']
     return {old_work_item_id: new_work_item_id}
 
-def create_work_items_from_folder(folder_path: str) -> Dict[int, int]:
+def create_work_items_from_folder(folder_path: str, new_epic_name: str) -> Dict[int, int]:
     parent_id_mapping = {}
 
     # Define a function to sort work items by their WorkItemType
@@ -84,7 +93,7 @@ def create_work_items_from_folder(folder_path: str) -> Dict[int, int]:
                 if old_parent_id in parent_id_mapping:
                     parent_id = parent_id_mapping[old_parent_id]
 
-            new_work_item = create_work_item(work_item_data, parent_id)
+            new_work_item = create_work_item(work_item_data, parent_id, new_epic_name)
             parent_id_mapping.update(new_work_item)
 
     print('Parent ID Mapping:', parent_id_mapping)
@@ -92,7 +101,12 @@ def create_work_items_from_folder(folder_path: str) -> Dict[int, int]:
 
 def main():
     folder_path = "output"
-    create_work_items_from_folder(folder_path)
+    new_epic_name = input("Please enter the new epic name: ")
+    create_work_items_from_folder(folder_path, new_epic_name)
+
+if __name__ == "__main__":
+    main()
+
 
 if __name__ == "__main__":
     main()
