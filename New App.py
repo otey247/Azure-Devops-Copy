@@ -4,9 +4,9 @@ import json
 import base64
 from typing import Dict
 
-organization = 'jootey'
-project = 'Kroger%20Cloud%20Factory'
-pat = '4mjw246fzpp7lga7j2yld5myh5jam5trmrtuuomcti5cdg3dqwea'
+organization = ''
+project = ''
+pat = ''
 authorization = str(base64.b64encode(bytes(':'+pat, 'ascii')), 'ascii')
 
 headers = {
@@ -65,6 +65,8 @@ def create_work_item(work_item_data, parent_id=None, new_epic_name=None, relatio
         rel_type = relation.get('rel')
         if rel_type == 'System.LinkTypes.Dependency-Reverse' or rel_type == 'System.LinkTypes.Dependency-Foward':
             old_related_work_item_id = int(relation['url'].split('/')[-1])
+
+            # Ensure the old_related_work_item_id is in parent_id_mapping
             if old_related_work_item_id in parent_id_mapping:
                 new_related_work_item_id = parent_id_mapping[old_related_work_item_id]
                 comment = relation.get('attributes', {}).get('comment', None)
@@ -81,6 +83,8 @@ def create_work_item(work_item_data, parent_id=None, new_epic_name=None, relatio
                         }
                     }
                 })
+            else:
+                print(f"Warning: old_related_work_item_id {old_related_work_item_id} not found in parent_id_mapping. Skipping relation.")
 
 
     work_item_type = work_item_fields['System.WorkItemType']
@@ -90,6 +94,7 @@ def create_work_item(work_item_data, parent_id=None, new_epic_name=None, relatio
     # Debugging lines
     # print("Response Status:", response.status_code)
     # print("Response Data:", response_data)
+    
 
     if "id" not in response_data:
         print("Error: ID not found in the response.")
@@ -138,4 +143,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
