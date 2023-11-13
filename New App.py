@@ -32,6 +32,7 @@ def create_work_item(work_item_data, parent_id=None, new_epic_name=None, relatio
         'System.WorkItemType',
         'System.Title',
         'Microsoft.VSTS.Common.Priority',
+        'Microsoft.VSTS.Scheduling.StoryPoints',
         'Microsoft.VSTS.Common.ValueArea',
         'Microsoft.VSTS.Scheduling.Effort',
         'System.Description',
